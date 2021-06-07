@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.atguigu.dao.OrderDao">
+    <!--添加订单-->
+    <insert id="add" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_order(member_id,orderDate,orderType,orderStatus,setmeal_id)
+        VALUES(#{memberId},#{orderDate},#{orderType},#{orderStatus},#{setmealId})
+    </insert>
+
+     <!--根据条件查询order-->
+    <select id="findByCriteria" resultType="com.atguigu.pojo.Order">
+        SELECT * FROM t_order
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="memberId != null">
+                and member_id = #{memberId}
+            </if>
+            <if test="orderDate != null">
+                and orderDate = #{orderDate}
+            </if>
+            <if test="orderType != null">
+                and orderType = #{orderType}
+            </if>
+            <if test="orderStatus != null">
+                and orderStatus = #{orderStatus}
+            </if>
+            <if test="setmealId != null">
+                and setmeal_id = #{setmealId}
+            </if>
+        </where>
+    </select>
+
+    <!--根据id查询订单-->
+    <select id="findById" resultType="java.util.Map">
+        SELECT o.orderDate,o.orderType,m.name member,s.name setmeal
+        FROM t_order o
+        LEFT OUTER JOIN t_member m ON o.member_id=m.id
+        LEFT OUTER JOIN t_setmeal s ON o.setmeal_id= s.id
+        WHERE o.id=#{id}
+
+    </select>
+
+    <!--查找今日的订单数-->
+    <select id="findNewOrderToday" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM t_order
+        WHERE orderDate=#{value}
+    </select>
+    <!--查找今日的已出游数-->
+    <select id="findVisitNumberToday" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM t_order
+        WHERE orderstatus='已出游' AND orderDate=#{value}
+    </select>
+
+    <!--查找本月或本周的已出游数-->
+    <select id="findNewVisitAfter" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM t_order
+        WHERE orderstatus='已出游' AND orderDate &gt;=#{value}
+    </select>
+    <!--查找本周或本月的新订单-->
+    <select id="findNewOrderBetween" resultType="java.lang.Integer">
+        SELECT COUNT(*) setmeal_count
+        FROM t_order
+        WHERE orderDate BETWEEN #{begin} AND #{end}
+    </select>
+
+
+</mapper>
+
+

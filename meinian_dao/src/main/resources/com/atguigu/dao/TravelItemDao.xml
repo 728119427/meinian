@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.atguigu.dao.TravelItemDao">
+
+    <!--添加自由行-->
+    <update id="edit">
+        UPDATE t_travelitem
+        <set>
+            <if test="code!=null and code.length>0">
+                code=#{code},
+            </if>
+            <if test="name!=null and name.length>0">
+                `name`=#{name},
+            </if>
+            <if test="sex!=null and sex.length>0">
+                sex=#{sex},
+            </if>
+            <if test="age!=null and age.length>0">
+                age=#{age},
+            </if>
+            <if test="price!=null ">
+                price=#{price},
+            </if>
+            <if test="type!=null and type.length>0">
+                type=#{type},
+            </if>
+            <if test="remark!=null and remark.length>0">
+                remark=#{remark},
+            </if>
+            <if test="attention!=null and attention.length>0">
+                attention=#{attention}
+            </if>
+        </set>
+        WHERE id=#{id}
+    </update>
+
+    <!--编辑自由心-->
+   <insert id="add" parameterType="com.atguigu.pojo.TravelItem">
+       INSERT INTO t_travelitem(code,`name`,sex,age,price,`type`,remark,attention)
+       VALUES (#{code},#{name},#{sex},#{age},#{price},#{type},#{remark},#{attention})
+   </insert>
+
+
+     <!--分页查询-->
+    <select id="findPage" resultType="com.atguigu.pojo.TravelItem">
+        SELECT id,code,`name`,sex,age,price,`type`,remark,attention
+        FROM t_travelitem
+        <where>
+            <if test="query != null and query.length()>0">
+                code=#{query} OR `name` LIKE "%"#{query}"%"
+            </if>
+        </where>
+    </select>
+
+    <!--查询中间表是否有相关记录-->
+    <select id="findCountByTravelItemId" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM t_travelgroup_travelitem
+        WHERE travelitem_id=#{id}
+    </select>
+
+    <!--根据id查询自由行-->
+    <select id="findById" resultType="com.atguigu.pojo.TravelItem">
+        SELECT  id,code,`name`,sex,age,price,`type`,remark,attention
+        FROM t_travelitem
+        WHERE id=#{id}
+    </select>
+    <!--查询所有自由行-->
+    <select id="findAll" resultType="com.atguigu.pojo.TravelItem">
+        SELECT id,code,`name`,sex,age,price,`type`,remark,attention
+        FROM t_travelitem
+    </select>
+
+    <!--根据groupId查询item-->
+    <select id="findTravelItemListByGroupId" resultType="com.atguigu.pojo.TravelItem">
+        SELECT id,code,`name`,sex,age,price,`type`,remark,attention
+        FROM t_travelitem
+        WHERE id
+        IN (SELECT travelitem_id FROM t_travelgroup_travelitem WHERE travelgroup_id=#{id})
+    </select>
+
+    <!--删除自由行-->
+    <delete id="delete">
+        DELETE FROM t_travelitem
+        WHERE id=#{id}
+    </delete>
+</mapper>
+
+
+

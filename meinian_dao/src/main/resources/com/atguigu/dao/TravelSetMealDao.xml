@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.atguigu.dao.TravelSetMealDao">
+
+
+    <resultMap id="BaseResultMap" type="com.atguigu.pojo.Setmeal">
+        <id property="id" column="id"></id>
+        <result property="name" column="name"></result>
+        <result property="code" column="code"></result>
+        <result property="helpCode" column="helpCode"></result>
+        <result property="sex" column="sex"></result>
+        <result property="age" column="age"></result>
+        <result property="price" column="price"></result>
+        <result property="remark" column="remark"></result>
+        <result property="attention" column="attention"></result>
+        <result property="img" column="img"></result>
+        <collection property="travelGroups" column="id" select="com.atguigu.dao.TravelGroupDao.findTravelGroupListBySetmealId"></collection>
+    </resultMap>
+
+    <!--插入套餐-->
+    <insert id="add" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_setmeal(`name`,code,helpCode,sex,age,price,remark,attention,img)
+        VALUES ( #{name},#{code},#{helpCode},#{sex},#{age},#{price},#{remark},#{attention},#{img})
+    </insert>
+
+    <!--插入中间表-->
+    <insert id="insert_travelGroup_setMeal">
+        INSERT INTO   t_setmeal_travelgroup(setmeal_id,travelgroup_id)
+        VALUES (#{setmealId},#{travelgroupId})
+    </insert>
+
+    <!--分页查询套餐游信息-->
+    <select id="findPage" resultType="com.atguigu.pojo.Setmeal">
+        SELECT id,`name`,code,helpCode,sex,age,price,remark,attention,img
+        FROM t_setmeal
+        <where>
+            <if test="query!=null and query.length>0">
+                code=#{query} OR helpCode=#{query} OR `name` LIKE "%"#{query}"%"
+            </if>
+        </where>
+    </select>
+
+    <!--查询套餐有信息-->
+    <select id="findAll" resultType="com.atguigu.pojo.Setmeal">
+         SELECT id,`name`,code,helpCode,sex,age,price,remark,attention,img
+        FROM t_setmeal
+    </select>
+
+
+    <!--根据id查询套餐-->
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT id,`name`,code,helpCode,sex,age,price,remark,attention,img
+        FROM t_setmeal
+        WHERE id=#{id}
+    </select>
+
+    <!--分类查找套餐的数量和名字-->
+    <select id="findSetmelCount" resultType="java.util.Map">
+        SELECT S.name ,COUNT(*) value
+        FROM t_setmeal S LEFT OUTER JOIN t_order O
+        ON S.id= O.setmeal_id
+        GROUP BY S.name
+    </select>
+
+    <!--查找热门套餐-->
+    <select id="findHotSetMeal" resultType="java.util.Map">
+        SELECT S.name ,COUNT(*) setmeal_count,COUNT(*)/(SELECT COUNT(*) FROM t_order)  proportion
+        FROM t_setmeal S LEFT OUTER JOIN t_order O
+        ON S.id= O.setmeal_id
+        GROUP BY S.name
+        ORDER BY proportion DESC
+        LIMIT 0,4
+    </select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.atguigu.dao.TravelGroupDao">
+
+
+    <resultMap id="BaseResultMap" type="com.atguigu.pojo.TravelGroup">
+        <id property="id" column="id"></id>
+        <result property="code" column="code"></result>
+         <result property="name" column="name"></result>
+         <result property="helpCode" column="helpCode"></result>
+         <result property="sex" column="sex"></result>
+         <result property="remark" column="remark"></result>
+         <result property="attention" column="attention"></result>
+        <collection property="travelItems" column="id" select="com.atguigu.dao.TravelItemDao.findTravelItemListByGroupId"></collection>
+     </resultMap>
+
+    <!--添加跟团游-->
+    <insert id="add" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_travelgroup (code,`name`,helpCode,sex,remark,attention)
+        VALUES (#{code},#{name},#{helpCode},#{sex},#{remark},#{attention} )
+    </insert>
+
+
+    <!--添加中间表-->
+    <insert id="insert_travelGroup_travelItem">
+        INSERT INTO t_travelgroup_travelitem(travelgroup_id,travelitem_id) VALUES (#{groupId},#{itemId})
+    </insert>
+
+    <!--更新旅游团信息-->
+    <update id="edit">
+        UPDATE t_travelgroup
+        <set>
+            <if test="code!=null and code.length()>0">
+                code=#{code},
+            </if>
+            <if test="name!=null and name.length()>0">
+                `name`=#{name},
+            </if>
+            <if test="helpCode!=null and helpCode.length()>0">
+                helpCode=#{helpCode},
+            </if>
+            <if test="sex!=null and sex.length()>0">
+                sex=#{sex},
+            </if>
+            <if test="remark!=null and remark.length()>0">
+                remark=#{remark},
+            </if>
+            <if test="attention!=null and attention.length()>0">
+                attention=#{attention},
+            </if>
+        </set>
+        WHERE id=#{id}
+    </update>
+
+    <!--删除旅游团的原始中间表信息-->
+    <delete id="deleteItemIdsByGroupId">
+        DELETE FROM t_travelgroup_travelitem
+        WHERE travelgroup_id=#{id}
+    </delete>
+
+
+    <!--分页查询-->
+    <select id="findPage" resultType="com.atguigu.pojo.TravelGroup">
+        SELECT id,code,`name`,helpCode,sex,remark,attention
+        FROM t_travelgroup
+        <where>
+            <if test="query != null and query.length()>0">
+                code=#{query} OR `name` LIKE "%"#{query}"%" OR helpCode=#{query}
+            </if>
+        </where>
+    </select>
+    <!--根据id查询旅游团-->
+    <select id="findById" resultType="com.atguigu.pojo.TravelGroup">
+        SELECT id,code,`name`,helpCode,sex,remark,attention
+        FROM t_travelgroup
+        WHERE id=#{id}
+    </select>
+    <!--根据groupId查找itemIds-->
+    <select id="findTravelItemByTravelGroupId" resultType="java.lang.Integer">
+        SELECT travelitem_id
+        FROM t_travelgroup_travelitem
+        WHERE travelgroup_id=#{id}
+    </select>
+    <!--查询所有跟团游信息-->
+    <select id="findAll" resultType="com.atguigu.pojo.TravelGroup">
+        SELECT id,code,`name`,helpCode,sex,remark,attention
+        FROM t_travelgroup;
+    </select>
+
+    <!--根据套餐id查询groups-->
+    <select id="findTravelGroupListBySetmealId" resultMap="BaseResultMap">
+         SELECT id,code,`name`,helpCode,sex,remark,attention
+        FROM t_travelgroup
+        WHERE id
+        IN (SELECT travelgroup_id FROM t_setmeal_travelgroup WHERE setmeal_id=#{id})
+
+    </select>
+</mapper>
+

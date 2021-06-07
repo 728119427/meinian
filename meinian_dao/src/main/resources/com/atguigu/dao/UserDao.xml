@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.atguigu.dao.UserDao">
+
+    <resultMap id="BaseResultMap" type="com.atguigu.pojo.User">
+        <id property="id" column="id"></id>
+        <result property="birthday" column="birthday"></result>
+        <result property="gender" column="gender"></result>
+        <result property="username" column="username"></result>
+        <result property="password" column="password"></result>
+        <result property="remark" column="remark"></result>
+        <result property="station" column="station"></result>
+        <result property="telephone" column="telephone"></result>
+        <collection property="roles" column="id" select="com.atguigu.dao.RoleDao.findRoleByUserId"></collection>
+    </resultMap>
+
+
+    <!--根据用户名查找用户-->
+    <select id="findByUsername" resultMap="BaseResultMap">
+            SELECT id,birthday,gender,username,password,remark,station,telephone
+            FROM t_user
+            WHERE username=#{username}
+    </select>
+
+</mapper>
+

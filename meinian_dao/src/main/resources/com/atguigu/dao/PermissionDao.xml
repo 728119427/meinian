@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.atguigu.dao.PermissionDao">
+
+
+    <!--根据roleId查询权限-->
+    <select id="findPermissionByRoleId" resultType="com.atguigu.pojo.Permission">
+        SELECT p.id,p.name,p.keyword,p.description
+        FROM t_role_permission rp INNER JOIN t_permission p
+        ON rp.permission_id=p.id
+        WHERE rp.role_id=#{id}
+    </select>
+</mapper>
